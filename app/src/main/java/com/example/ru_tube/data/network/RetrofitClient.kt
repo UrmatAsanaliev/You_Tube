@@ -4,27 +4,35 @@ import com.example.ru_tube.BuildConfig
 import com.example.ru_tube.data.remove.ApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-class RetrofitClient {
+val NetworkModule = module{
+    single { provideOkkHttpClient() }
+    single { provideApi(get())}
+    single { provideRetrofit(get()) }
+}
 
-    companion object {
-        fun create() : ApiService{
-            val interceptor = HttpLoggingInterceptor()
-            interceptor.level = HttpLoggingInterceptor.Level.BODY
 
-            val okHttpClient = OkHttpClient.Builder()
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .addInterceptor(interceptor)
-                .build()
+fun provideApi(retrofit: Retrofit) : ApiService {
+    return retrofit.create(ApiService::class.java)
+}
 
-            val retrofit = Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build()
-            return retrofit.create(ApiService::class.java)
-        }
-    }
+fun provideRetrofit(okkHttpClient: OkHttpClient) : Retrofit {
+    return Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
+        .client(okkHttpClient)
+        .addConverterFactory(GsonConverterFactory.create()).build()
+}
+
+fun provideOkkHttpClient() : OkHttpClient {
+    val interceptor = HttpLoggingInterceptor()
+    interceptor.level = HttpLoggingInterceptor.Level.BODY
+    return OkHttpClient.Builder()
+        .writeTimeout(5, TimeUnit.SECONDS)
+        .readTimeout(5, TimeUnit.SECONDS)
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .addInterceptor(interceptor)
+        .build()
 }

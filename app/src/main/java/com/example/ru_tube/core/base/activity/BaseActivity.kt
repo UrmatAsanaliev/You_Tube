@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
+import com.example.ru_tube.R
 import com.example.ru_tube.core.base.viewmodel.BaseViewModel
 
 typealias Inflate<T> = (LayoutInflater) -> T
@@ -17,6 +18,7 @@ abstract class BaseActivity<VB : ViewBinding, VM: BaseViewModel>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.Theme_Ru_Tube)
         binding = inflate.invoke(layoutInflater)
         setContentView(binding.root)
         setupUI()
